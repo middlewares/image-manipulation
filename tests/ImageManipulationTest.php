@@ -22,7 +22,10 @@ class ImageManipulationTest extends \PHPUnit_Framework_TestCase
             function ($request) use ($path) {
                 $this->assertEquals($path, $request->getUri()->getPath());
 
-                return (new Response())->withBody(new Stream(__DIR__.$path));
+                $response = new Response();
+                $response->getBody()->write(file_get_contents('https://upload.wikimedia.org/wikipedia/commons/5/58/Vaca_rubia_galega._Oroso_1.jpg'));
+
+                return $response;
             },
         ]))->dispatch($request);
 
@@ -30,13 +33,10 @@ class ImageManipulationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
         $this->assertEquals('image/png', $response->getHeaderLine('Content-Type'));
 
-        /* imagecreatefromstring(): gd-jpeg, libjpeg: recoverable error: Corrupt JPEG data: 68 extraneous bytes before marker 0xc2
-
         $info = getimagesizefromstring((string) $response->getBody());
 
         $this->assertEquals(50, $info[0]);
         $this->assertEquals(50, $info[1]);
         $this->assertEquals(IMAGETYPE_PNG, $info[2]);
-        */
     }
 }

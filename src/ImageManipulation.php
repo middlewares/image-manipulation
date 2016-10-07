@@ -118,7 +118,9 @@ class ImageManipulation implements MiddlewareInterface
             $response = $response->withHeader('Accept-CH', implode(',', $this->clientHints));
         }
 
-        if ($response->getStatusCode() === 200 && (int) $response->getBody()->getSize() > 1) {
+        $size = $response->getBody()->getSize();
+
+        if ($response->getStatusCode() === 200 && ($size === null || $size > 1)) {
             return $this->transform($response, $transform, $this->getClientHints($request));
         }
 

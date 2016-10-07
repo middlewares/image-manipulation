@@ -63,7 +63,7 @@ class ImageManipulation implements MiddlewareInterface
             ->sign(new Sha256(), $signatureKey)
             ->getToken();
 
-        return str_replace('.', '/', $token).'.'.$extension;
+        return '/'.str_replace('.', '/', $token).'.'.$extension;
     }
 
     /**
@@ -195,10 +195,9 @@ class ImageManipulation implements MiddlewareInterface
                 return;
             }
 
+            $path = array_slice($path, -3);
             $path[2] = pathinfo($path[2], PATHINFO_FILENAME);
-
-            $token = implode('.', array_slice($path, -3));
-            $token = (new Parser())->parse($token);
+            $token = (new Parser())->parse(implode('.', $path));
 
             if (!$token->verify(new Sha256(), $this->signatureKey)) {
                 return;

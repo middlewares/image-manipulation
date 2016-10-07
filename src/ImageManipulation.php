@@ -113,7 +113,6 @@ class ImageManipulation implements MiddlewareInterface
 
         list($path, $transform) = $payload;
 
-
         $request = $request->withUri($uri->withPath($path));
         $response = $delegate->process($request);
 

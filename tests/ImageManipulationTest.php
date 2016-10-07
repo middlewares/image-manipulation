@@ -30,7 +30,7 @@ class ImageManipulationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
         $this->assertEquals('image/png', $response->getHeaderLine('Content-Type'));
 
-        $info = getimagesizefromstring((string) $response->getBody());
+        $info = @getimagesizefromstring((string) $response->getBody());
 
         $this->assertEquals(50, $info[0]);
         $this->assertEquals(50, $info[1]);

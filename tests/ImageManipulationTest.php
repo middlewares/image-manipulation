@@ -14,7 +14,7 @@ class ImageManipulationTest extends \PHPUnit_Framework_TestCase
         $key = uniqid();
         $path = '/assets/foto.jpg';
         $uri = ImageManipulation::getUri($path, 'resizeCrop,50,50|format,png', $key);
-        $request = (new Request($uri))->withHeader('Accept', 'image/*');
+        $request = (new Request('/subdirectory/of/images'.$uri))->withHeader('Accept', 'image/*');
 
         $response = (new Dispatcher([
             new ImageManipulation($key),

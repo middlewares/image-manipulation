@@ -7,7 +7,7 @@
 [![Total Downloads][ico-downloads]][link-downloads]
 [![SensioLabs Insight][ico-sensiolabs]][link-sensiolabs]
 
-Middleware to transform images on demand, allowing resize, crop, rotate and transform to other formats. Uses [imagecow](https://github.com/oscarotero/imagecow) library that has support for [client hints](https://www.smashingmagazine.com/2016/01/leaner-responsive-images-client-hints/) and different [automatic cropping methods](https://github.com/oscarotero/imagecow#automatic-cropping).
+Middleware to transform images on demand, allowing resize, crop, rotate and transform to other formats. Uses [imagecow](https://github.com/oscarotero/imagecow) library that can detect and use `Gd` and `Imagick`, and also has support for [client hints](https://www.smashingmagazine.com/2016/01/leaner-responsive-images-client-hints/) and different [automatic cropping methods](https://github.com/oscarotero/imagecow#automatic-cropping).
 
 The uri is generated encoding the image path and the manipulation options with [lcobucci/jwt](https://github.com/lcobucci/jwt/), to prevent alterations and image-resize attacks.
 

@@ -21,9 +21,12 @@ class ImageManipulationTest extends \PHPUnit_Framework_TestCase
             new ImageManipulation($key),
             function ($request) use ($path) {
                 $this->assertEquals($path, $request->getUri()->getPath());
+                $content = file_get_contents(
+                    'https://upload.wikimedia.org/wikipedia/commons/5/58/Vaca_rubia_galega._Oroso_1.jpg'
+                );
 
                 $response = new Response();
-                $response->getBody()->write(file_get_contents('https://upload.wikimedia.org/wikipedia/commons/5/58/Vaca_rubia_galega._Oroso_1.jpg'));
+                $response->getBody()->write($content);
 
                 return $response;
             },

@@ -1,0 +1,115 @@
+# middlewares/image-manipulation
+
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Software License][ico-license]](LICENSE.md)
+[![Build Status][ico-travis]][link-travis]
+[![Quality Score][ico-scrutinizer]][link-scrutinizer]
+[![Total Downloads][ico-downloads]][link-downloads]
+[![SensioLabs Insight][ico-sensiolabs]][link-sensiolabs]
+
+Middleware to transform images on demand, allowing resize, crop, rotate and transform to other formats. Uses [imagecow](https://github.com/oscarotero/imagecow) library that has support for [client hints](https://www.smashingmagazine.com/2016/01/leaner-responsive-images-client-hints/) and different [automatic cropping methods](https://github.com/oscarotero/imagecow#automatic-cropping).
+
+The uri is generated encoding the image path and the manipulation options with [lcobucci/jwt](https://github.com/lcobucci/jwt/), to prevent alterations and image-resize attacks.
+
+**Note:** To keep the [SRP](https://en.wikipedia.org/wiki/Single_responsibility_principle), this middleware does not provide the following functionalities, that should be delegated to other middleware:
+
+* **Read the image from a directory:** this library just manipulate the image response returned by inner middlewares, does NOT read in the filesystem.
+
+* **Image caching:** The library returns a response with the manipulated image but does NOT provide any caching system.
+
+It's possible to combine this library with [middlewares/filesystem](https://github.com/middlewares/filesystem) that allows to read and write to the filesystem. (See [example](#example) below).
+
+## Requirements
+
+* PHP >= 5.6
+* A [PSR-7](https://packagist.org/providers/psr/http-message-implementation) http mesage implementation ([Diactoros](https://github.com/zendframework/zend-diactoros), [Guzzle](https://github.com/guzzle/psr7), [Slim](https://github.com/slimphp/Slim), etc...)
+* A [PSR-15](https://github.com/http-interop/http-middleware) middleware dispatcher ([Middleman](https://github.com/mindplay-dk/middleman), etc...)
+
+## Installation
+
+This package is installable and autoloadable via Composer as [middlewares/image-manipulation](https://packagist.org/packages/middlewares/image-manipulation).
+
+```sh
+composer require middlewares/image-manipulation
+```
+
+## Example
+
+The following example uses also [middlewares/filesystem](https://github.com/middlewares/filesystem) to read/save the manipulated images.
+
+```php
+use Middlewares\ImageManipulation;
+use Middlewares\Reader;
+use Middlewares\Writer;
+
+//You need a signature key
+$key = 'sdf6&-$<@#asf';
+
+//Manipulated images directory
+$cachePath = '/path/to/cache';
+
+//Original images directory
+$imagePath = '/path/to/images';
+
+$dispatcher = new Dispatcher([
+    //read and returns the manipulated image if it's currently cached
+    (new Reader($cachePath))->continueOnError(),
+
+    //saves the manipulated images returned by the next middleware
+    new Writer($cachePath),
+
+    //transform the image
+	new Middlewares\ImageManipulation($key),
+
+    //read and return a response with original image
+    new Reader($imagePath)
+]);
+
+//Create a manipulated image uri
+$uri = Middlewares\ImageManipulation::getUri('image.jpg', 'resizeCrop,500,500,CROP_ENTROPY');
+
+$response = $dispatcher->dispatch(new Request($uri));
+```
+
+## Options
+
+#### `__construct(string $signatureKey)`
+
+The key used to sign the uri. This prevent attacks and alterations to the path. 
+
+#### `clientHints(array $clientHings)`
+
+Allow to use client hints. Is disabled by default. If this method is called with the default arguments, the allowed hints are `['Dpr', 'Viewport-Width', 'Width']`. Note that client hints [are supported only by Chrome and Opera browsers](http://caniuse.com/#feat=client-hints-dpr-width-viewport)
+
+## Helpers
+
+#### `ImageManipulation::getUri(string $image, string $transform, string $signatureKey = null)`
+
+To ease the uri creation this static method is provided, accepting three methods:
+
+* `$image`: The image path. This value is used to replace the uri's path of the request to the next middlewares.
+* `$transform`: The transformation details. You can use any [method of imagecow api](https://github.com/oscarotero/imagecow#execute-multiple-functions) as a string, for example:
+  * `resize,200`: Resize the image to 200px width (automatic height)
+  * `crop,200,500`: Crop the image to 200x500px (centered)
+  * `crop,100,100,CROP_ENTROPY`: Crop the image to 100x100px using the entropy method to find the most interesting point of the image
+  * `resize,300|rotate,90|format,jpg`: Resize the image to 300px width, rotate 90º and convert to jpg
+* `$signatureKey`: Optional signature key to sign the uri path. If it's not provided, use the same key passed to the middleware.
+
+---
+
+Please see [CHANGELOG](CHANGELOG.md) for more information about recent changes and [CONTRIBUTING](CONTRIBUTING.md) for contributing details.
+
+The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
+
+[ico-version]: https://img.shields.io/packagist/v/middlewares/image-manipulation.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/middlewares/image-manipulation/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/g/middlewares/image-manipulation.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/middlewares/image-manipulation.svg?style=flat-square
+[ico-sensiolabs]: https://img.shields.io/sensiolabs/i/36786f5a-2a15-4399-8817-8f24fcd8c0b4.svg?style=flat-square
+
+[link-packagist]: https://packagist.org/packages/middlewares/image-manipulation
+[link-travis]: https://travis-ci.org/middlewares/image-manipulation
+[link-scrutinizer]: https://scrutinizer-ci.com/g/middlewares/image-manipulation
+[link-downloads]: https://packagist.org/packages/middlewares/image-manipulation
+[link-sensiolabs]: https://insight.sensiolabs.com/projects/36786f5a-2a15-4399-8817-8f24fcd8c0b4

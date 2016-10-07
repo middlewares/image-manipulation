@@ -71,7 +71,7 @@ class ImageManipulation implements MiddlewareInterface
      */
     public function __construct($signatureKey)
     {
-        $this->signatureKey = static::$currentSignatureKey = $signatureKey;
+        $this->signatureKey = self::$currentSignatureKey = $signatureKey;
     }
 
     /**
@@ -118,7 +118,7 @@ class ImageManipulation implements MiddlewareInterface
             $response = $response->withHeader('Accept-CH', implode(',', $this->clientHints));
         }
 
-        if ($response->getStatusCode() === 200 && $response->getBody()->getSize()) {
+        if ($response->getStatusCode() === 200 && (int) $response->getBody()->getSize() > 1) {
             return $this->transform($response, $transform, $this->getClientHints($request));
         }
 
@@ -129,7 +129,7 @@ class ImageManipulation implements MiddlewareInterface
      * Transform the image.
      *
      * @param ResponseInterface $request
-     * @param string            $response
+     * @param string            $transform
      * @param array|null        $hints
      *
      * @return ResponseInterface

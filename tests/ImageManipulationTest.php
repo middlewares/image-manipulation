@@ -19,7 +19,7 @@ class ImageManipulationTest extends \PHPUnit_Framework_TestCase
         $response = (new Dispatcher([
             new ImageManipulation($key),
             function ($request) use ($path) {
-                $this->assertEquals($path, $request->getUri()->getPath());
+                $this->assertEquals('/subdirectory/of/images'.$path, $request->getUri()->getPath());
                 $content = file_get_contents(
                     'https://upload.wikimedia.org/wikipedia/commons/5/58/Vaca_rubia_galega._Oroso_1.jpg'
                 );

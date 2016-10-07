@@ -113,6 +113,7 @@ class ImageManipulation implements MiddlewareInterface
 
         list($path, $transform) = $payload;
 
+
         $request = $request->withUri($uri->withPath($path));
         $response = $delegate->process($request);
 
@@ -189,21 +190,27 @@ class ImageManipulation implements MiddlewareInterface
     private function getPayload($path)
     {
         try {
-            $path = explode('/', $path);
+            $path = explode('/', trim($path, '/'));
 
             if (count($path) < 3) {
                 return;
             }
 
-            $path = array_slice($path, -3);
-            $path[2] = pathinfo($path[2], PATHINFO_FILENAME);
-            $token = (new Parser())->parse(implode('.', $path));
+            $token = array_splice($path, -3);
+            $token[2] = pathinfo($token[2], PATHINFO_FILENAME);
+            $token = (new Parser())->parse(implode('.', $token));
 
             if (!$token->verify(new Sha256(), $this->signatureKey)) {
                 return;
             }
 
-            return $token->getClaim(self::DATA_CLAIM);
+            $payload = $token->getClaim(self::DATA_CLAIM);
+
+            if ($path && $payload) {
+                $payload[0] = str_replace('//', '/', '/'.implode('/', $path).'/'.$payload[0]);
+            }
+
+            return $payload;
         } catch (Exception $exception) {
             //silenced error
         }

@@ -58,10 +58,12 @@ class ImageManipulation implements MiddlewareInterface
             $extension = substr($transform, $pos + 7, 3);
         }
 
-        return (new Builder())
+        $token = (new Builder())
             ->set(self::DATA_CLAIM, [$path, $transform])
             ->sign(new Sha256(), $signatureKey)
-            ->getToken().'.'.$extension;
+            ->getToken();
+
+        return str_replace('.', '/', $token).'.'.$extension;
     }
 
     /**
@@ -103,7 +105,7 @@ class ImageManipulation implements MiddlewareInterface
         }
 
         $uri = $request->getUri();
-        $payload = self::getPayload(pathinfo($uri->getPath(), PATHINFO_FILENAME));
+        $payload = self::getPayload($uri->getPath());
 
         if (!$payload) {
             return $delegate->process($request);
@@ -180,14 +182,23 @@ class ImageManipulation implements MiddlewareInterface
     /**
      * Parse and return the payload.
      *
-     * @param string $token
+     * @param string $path
      *
      * @return array|null
      */
-    private function getPayload($token)
+    private function getPayload($path)
     {
         try {
-            $token = (new Parser())->parse((string) $token);
+            $path = explode('/', $path);
+
+            if (count($path) < 3) {
+                return;
+            }
+
+            $path[2] = pathinfo($path[2], PATHINFO_FILENAME);
+
+            $token = implode('.', array_slice($path, -3));
+            $token = (new Parser())->parse($token);
 
             if (!$token->verify(new Sha256(), $this->signatureKey)) {
                 return;

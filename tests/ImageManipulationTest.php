@@ -5,7 +5,6 @@ namespace Middlewares\Tests;
 use Middlewares\ImageManipulation;
 use Zend\Diactoros\Request;
 use Zend\Diactoros\Response;
-use Zend\Diactoros\Stream;
 use mindplay\middleman\Dispatcher;
 
 class ImageManipulationTest extends \PHPUnit_Framework_TestCase

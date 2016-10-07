@@ -132,7 +132,7 @@ class ImageManipulation implements MiddlewareInterface
     /**
      * Transform the image.
      *
-     * @param ResponseInterface $request
+     * @param ResponseInterface $response
      * @param string            $transform
      * @param array|null        $hints
      *
@@ -205,7 +205,7 @@ class ImageManipulation implements MiddlewareInterface
 
             $payload = $token->getClaim(self::DATA_CLAIM);
 
-            if ($path && $payload) {
+            if (!empty($path) && $payload) {
                 $payload[0] = str_replace('//', '/', '/'.implode('/', $path).'/'.$payload[0]);
             }
 

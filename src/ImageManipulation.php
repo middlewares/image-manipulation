@@ -2,9 +2,9 @@
 
 namespace Middlewares;
 
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Interop\Http\Middleware\MiddlewareInterface;
+use Interop\Http\Middleware\ServerMiddlewareInterface;
 use Interop\Http\Middleware\DelegateInterface;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
@@ -13,7 +13,7 @@ use Imagecow\Image;
 use RuntimeException;
 use Exception;
 
-class ImageManipulation implements MiddlewareInterface
+class ImageManipulation implements ServerMiddlewareInterface
 {
     const DATA_CLAIM = 'im';
 
@@ -93,12 +93,12 @@ class ImageManipulation implements MiddlewareInterface
     /**
      * Process a request and return a response.
      *
-     * @param RequestInterface  $request
-     * @param DelegateInterface $delegate
+     * @param ServerRequestInterface $request
+     * @param DelegateInterface      $delegate
      *
      * @return ResponseInterface
      */
-    public function process(RequestInterface $request, DelegateInterface $delegate)
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
         if (strpos($request->getHeaderLine('Accept'), 'image/') === false) {
             return $delegate->process($request);
@@ -160,11 +160,11 @@ class ImageManipulation implements MiddlewareInterface
     /**
      * Returns the client hints sent.
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      *
      * @return array|null
      */
-    private function getClientHints(RequestInterface $request)
+    private function getClientHints(ServerRequestInterface $request)
     {
         if (!empty($this->clientHints)) {
             $hints = [];

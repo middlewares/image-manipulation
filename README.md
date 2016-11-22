@@ -1,7 +1,7 @@
 # middlewares/image-manipulation
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
-[![Software License][ico-license]](LICENSE.md)
+[![Software License][ico-license]](LICENSE)
 [![Build Status][ico-travis]][link-travis]
 [![Quality Score][ico-scrutinizer]][link-scrutinizer]
 [![Total Downloads][ico-downloads]][link-downloads]
@@ -68,7 +68,7 @@ $dispatcher = new Dispatcher([
 //Create a manipulated image uri
 $uri = Middlewares\ImageManipulation::getUri('image.jpg', 'resizeCrop,500,500,CROP_ENTROPY');
 
-$response = $dispatcher->dispatch(new Request($uri));
+$response = $dispatcher->dispatch(new ServerRequest($uri));
 ```
 
 ## Options

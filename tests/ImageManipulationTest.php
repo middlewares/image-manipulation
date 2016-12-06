@@ -16,7 +16,7 @@ class ImageManipulationTest extends \PHPUnit_Framework_TestCase
         $request = Factory::createServerRequest([], 'GET', '/subdirectory/of/images'.$uri)
             ->withHeader('Accept', 'image/*');
 
-        $response = (new Dispatcher([
+        $response = Dispatcher::run([
             new ImageManipulation($key),
             function ($request) use ($path) {
                 $this->assertEquals('/subdirectory/of/images'.$path, $request->getUri()->getPath());
@@ -29,7 +29,7 @@ class ImageManipulationTest extends \PHPUnit_Framework_TestCase
 
                 return $response;
             },
-        ]))->dispatch($request);
+        ], $request);
 
         $this->assertEquals('png', pathinfo($uri, PATHINFO_EXTENSION));
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.3.2 - 2016-12-31
+
+### Changed
+
+* Ensure a subdirectory is created for each dot in the JWT path, to improve the filesystem cache.
+
 ## 0.3.1 - 2016-12-31
 
 ### Fixed

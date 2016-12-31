@@ -15,6 +15,7 @@ use Exception;
 
 class ImageManipulation implements MiddlewareInterface
 {
+    const MAX_FILENAME_LENGTH = 200;
     const DATA_CLAIM = 'im';
 
     /**
@@ -63,7 +64,7 @@ class ImageManipulation implements MiddlewareInterface
             ->sign(new Sha256(), $signatureKey)
             ->getToken();
 
-        return '/'.str_replace('.', '/', $token).'.'.$extension;
+        return '/_'.substr(chunk_split($token, self::MAX_FILENAME_LENGTH, '/'), 0, -1).'.'.$extension;
     }
 
     /**
@@ -189,15 +190,14 @@ class ImageManipulation implements MiddlewareInterface
     private function getPayload($path)
     {
         try {
-            $path = explode('/', trim($path, '/'));
+            $path = explode('/_', $path, 2);
 
-            if (count($path) < 3) {
+            if (!isset($path[1])) {
                 return;
             }
 
-            $token = array_splice($path, -3);
-            $token[2] = pathinfo($token[2], PATHINFO_FILENAME);
-            $token = (new Parser())->parse(implode('.', $token));
+            $path[1] = substr($path[1], 0, strrpos($path[1], '.'));
+            $token = (new Parser())->parse(str_replace('/', '', $path[1]));
 
             if (!$token->verify(new Sha256(), $this->signatureKey)) {
                 return;
@@ -205,8 +205,8 @@ class ImageManipulation implements MiddlewareInterface
 
             $payload = $token->getClaim(self::DATA_CLAIM);
 
-            if (!empty($path) && $payload) {
-                $payload[0] = str_replace('//', '/', '/'.implode('/', $path).'/'.$payload[0]);
+            if ($payload) {
+                $payload[0] = str_replace('//', '/', '/'.$path[0].'/'.$payload[0]);
             }
 
             return $payload;

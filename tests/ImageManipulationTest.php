@@ -8,18 +8,29 @@ use Middlewares\Utils\Factory;
 
 class ImageManipulationTest extends \PHPUnit_Framework_TestCase
 {
-    public function testImageManipulation()
+    public function basePathProvider()
+    {
+        return [
+            ['/subdirectory/of/images', '/assets/foto.jpg'],
+            ['/subdirectory/of/images', '/foto.jpg'],
+            ['', '/assets/foto.jpg'],
+        ];
+    }
+
+    /**
+     * @dataProvider basePathProvider
+     */
+    public function testImageManipulation($basePath, $path)
     {
         $key = uniqid();
-        $path = '/assets/foto.jpg';
         $uri = ImageManipulation::getUri($path, 'resizeCrop,50,50|format,png', $key);
-        $request = Factory::createServerRequest([], 'GET', '/subdirectory/of/images'.$uri)
+        $request = Factory::createServerRequest([], 'GET', $basePath.$uri)
             ->withHeader('Accept', 'image/*');
 
         $response = Dispatcher::run([
             new ImageManipulation($key),
-            function ($request) use ($path) {
-                $this->assertEquals('/subdirectory/of/images'.$path, $request->getUri()->getPath());
+            function ($request) use ($basePath, $path) {
+                $this->assertEquals($basePath.$path, $request->getUri()->getPath());
                 $content = file_get_contents(
                     'https://upload.wikimedia.org/wikipedia/commons/5/58/Vaca_rubia_galega._Oroso_1.jpg'
                 );

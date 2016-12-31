@@ -64,7 +64,9 @@ class ImageManipulation implements MiddlewareInterface
             ->sign(new Sha256(), $signatureKey)
             ->getToken();
 
-        return '/_'.substr(chunk_split(str_replace('.', './', $token), self::MAX_FILENAME_LENGTH, '/'), 0, -1).'.'.$extension;
+        $token = chunk_split(str_replace('.', './', $token), self::MAX_FILENAME_LENGTH, '/');
+
+        return '/_'.substr($token, 0, -1).'.'.$extension;
     }
 
     /**

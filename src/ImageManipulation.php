@@ -17,6 +17,7 @@ class ImageManipulation implements MiddlewareInterface
 {
     const MAX_FILENAME_LENGTH = 200;
     const DATA_CLAIM = 'im';
+    const BASE_PATH = '/_/';
 
     /**
      * @var string
@@ -64,9 +65,9 @@ class ImageManipulation implements MiddlewareInterface
             ->sign(new Sha256(), $signatureKey)
             ->getToken();
 
-        $token = chunk_split(str_replace('.', './', $token), self::MAX_FILENAME_LENGTH, '/');
+        $token = chunk_split($token, self::MAX_FILENAME_LENGTH, '/');
 
-        return '/_'.substr($token, 0, -1).'.'.$extension;
+        return self::BASE_PATH.substr($token, 0, -1).'.'.$extension;
     }
 
     /**
@@ -191,15 +192,14 @@ class ImageManipulation implements MiddlewareInterface
      */
     private function getPayload($path)
     {
+        if (strpos($path, self::BASE_PATH) === false) {
+            return;
+        }
+
         try {
-            $path = explode('/_', $path, 2);
+            list($basePath, $token) = explode(self::BASE_PATH, $path, 2);
 
-            if (!isset($path[1])) {
-                return;
-            }
-
-            $path[1] = substr($path[1], 0, strrpos($path[1], '.'));
-            $token = (new Parser())->parse(str_replace('/', '', $path[1]));
+            $token = (new Parser())->parse(str_replace('/', '', substr($token, 0, strrpos($token, '.'))));
 
             if (!$token->verify(new Sha256(), $this->signatureKey)) {
                 return;
@@ -208,12 +208,12 @@ class ImageManipulation implements MiddlewareInterface
             $payload = $token->getClaim(self::DATA_CLAIM);
 
             if ($payload) {
-                $payload[0] = str_replace('//', '/', '/'.$path[0].'/'.$payload[0]);
+                $payload[0] = str_replace('//', '/', '/'.$basePath.'/'.$payload[0]);
             }
 
             return $payload;
         } catch (Exception $exception) {
-            //silenced error
+            return;
         }
     }
 }

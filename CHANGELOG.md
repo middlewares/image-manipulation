@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.3.3 - 2017-02-06
+
+### Changed
+
+* Modified the way to create JWT paths to prevent parts like `/./`, causing the loss of the dots after resolving the path.
+
 ## 0.3.2 - 2016-12-31
 
 ### Changed

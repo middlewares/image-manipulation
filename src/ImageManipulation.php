@@ -66,6 +66,7 @@ class ImageManipulation implements MiddlewareInterface
             ->getToken();
 
         $token = chunk_split($token, self::MAX_FILENAME_LENGTH, '/');
+        $token = str_replace('/.', './', $token);
 
         return self::BASE_PATH.substr($token, 0, -1).'.'.$extension;
     }

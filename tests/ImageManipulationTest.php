@@ -2,11 +2,12 @@
 
 namespace Middlewares\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Middlewares\ImageManipulation;
 use Middlewares\Utils\Dispatcher;
 use Middlewares\Utils\Factory;
 
-class ImageManipulationTest extends \PHPUnit_Framework_TestCase
+class ImageManipulationTest extends TestCase
 {
     public function basePathProvider()
     {

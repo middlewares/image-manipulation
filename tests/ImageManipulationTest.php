@@ -34,9 +34,7 @@ class ImageManipulationTest extends TestCase
             new ImageManipulation($key),
             function ($request) use ($basePath, $path) {
                 $this->assertEquals($basePath.$path, $request->getUri()->getPath());
-                $content = file_get_contents(
-                    'https://upload.wikimedia.org/wikipedia/commons/5/58/Vaca_rubia_galega._Oroso_1.jpg'
-                );
+                $content = file_get_contents(__DIR__.'/assets/vaca_rubia_galega_oroso.jpg');
 
                 $response = Factory::createResponse();
                 $response->getBody()->write($content);

@@ -2,10 +2,10 @@
 
 namespace Middlewares\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Middlewares\ImageManipulation;
 use Middlewares\Utils\Dispatcher;
 use Middlewares\Utils\Factory;
+use PHPUnit\Framework\TestCase;
 
 class ImageManipulationTest extends TestCase
 {
@@ -20,6 +20,8 @@ class ImageManipulationTest extends TestCase
 
     /**
      * @dataProvider basePathProvider
+     * @param mixed $basePath
+     * @param mixed $path
      */
     public function testImageManipulation($basePath, $path)
     {

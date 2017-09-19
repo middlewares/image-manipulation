@@ -4,8 +4,8 @@ namespace Middlewares;
 
 use Exception;
 use Imagecow\Image;
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use Interop\Http\Server\MiddlewareInterface;
+use Interop\Http\Server\RequestHandlerInterface;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
@@ -98,28 +98,28 @@ class ImageManipulation implements MiddlewareInterface
     /**
      * Process a request and return a response.
      *
-     * @param ServerRequestInterface $request
-     * @param DelegateInterface      $delegate
+     * @param ServerRequestInterface  $request
+     * @param RequestHandlerInterface $handler
      *
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler)
     {
         if (strpos($request->getHeaderLine('Accept'), 'image/') === false) {
-            return $delegate->process($request);
+            return $handler->handle($request);
         }
 
         $uri = $request->getUri();
         $payload = self::getPayload($uri->getPath());
 
         if (!$payload) {
-            return $delegate->process($request);
+            return $handler->handle($request);
         }
 
         list($path, $transform) = $payload;
 
         $request = $request->withUri($uri->withPath($path));
-        $response = $delegate->process($request);
+        $response = $handler->handle($request);
 
         if (!empty($this->clientHints)) {
             $response = $response->withHeader('Accept-CH', implode(',', $this->clientHints));

@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## UNRELEASED
+## [0.4.4] - 2017-09-21
 
 ### Changed
 
@@ -62,6 +62,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First version
 
+[0.4.4]: https://github.com/middlewares/image-manipulation/compare/v0.3.4...v0.4.4
 [0.3.4]: https://github.com/middlewares/image-manipulation/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/middlewares/image-manipulation/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/middlewares/image-manipulation/compare/v0.3.1...v0.3.2

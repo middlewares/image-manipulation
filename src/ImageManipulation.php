@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Middlewares;
 
@@ -36,14 +37,8 @@ class ImageManipulation implements MiddlewareInterface
 
     /**
      * Build a new uri with the payload.
-     *
-     * @param string      $path         The image path
-     * @param string      $transform    The image transform
-     * @param string|null $signatureKey
-     *
-     * @return string
      */
-    public static function getUri($path, $transform, $signatureKey = null)
+    public static function getUri(string $path, string $transform, string $signatureKey = null): string
     {
         $signatureKey = $signatureKey ?: self::$currentSignatureKey;
 
@@ -65,7 +60,7 @@ class ImageManipulation implements MiddlewareInterface
             ->sign(new Sha256(), $signatureKey)
             ->getToken();
 
-        $token = chunk_split($token, self::MAX_FILENAME_LENGTH, '/');
+        $token = chunk_split((string) $token, self::MAX_FILENAME_LENGTH, '/');
         $token = str_replace('/.', './', $token);
 
         return self::BASE_PATH.substr($token, 0, -1).'.'.$extension;
@@ -73,22 +68,16 @@ class ImageManipulation implements MiddlewareInterface
 
     /**
      * Set the signature key used to encode/decode the data.
-     *
-     * @param string $signatureKey
      */
-    public function __construct($signatureKey)
+    public function __construct(string $signatureKey)
     {
         $this->signatureKey = self::$currentSignatureKey = $signatureKey;
     }
 
     /**
      * Enable the client hints.
-     *
-     * @param array $clientHints
-     *
-     * @return self
      */
-    public function clientHints($clientHints = ['Dpr', 'Viewport-Width', 'Width'])
+    public function clientHints(array $clientHints = ['Dpr', 'Viewport-Width', 'Width']): self
     {
         $this->clientHints = $clientHints;
 
@@ -97,13 +86,8 @@ class ImageManipulation implements MiddlewareInterface
 
     /**
      * Process a request and return a response.
-     *
-     * @param ServerRequestInterface  $request
-     * @param RequestHandlerInterface $handler
-     *
-     * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if (strpos($request->getHeaderLine('Accept'), 'image/') === false) {
             return $handler->handle($request);
@@ -136,14 +120,8 @@ class ImageManipulation implements MiddlewareInterface
 
     /**
      * Transform the image.
-     *
-     * @param ResponseInterface $response
-     * @param string            $transform
-     * @param array|null        $hints
-     *
-     * @return ResponseInterface
      */
-    private function transform(ResponseInterface $response, $transform, array $hints = null)
+    private function transform(ResponseInterface $response, string $transform, array $hints = null): ResponseInterface
     {
         $image = Image::fromString((string) $response->getBody());
 
@@ -165,8 +143,6 @@ class ImageManipulation implements MiddlewareInterface
     /**
      * Returns the client hints sent.
      *
-     * @param ServerRequestInterface $request
-     *
      * @return array|null
      */
     private function getClientHints(ServerRequestInterface $request)
@@ -187,11 +163,9 @@ class ImageManipulation implements MiddlewareInterface
     /**
      * Parse and return the payload.
      *
-     * @param string $path
-     *
      * @return array|null
      */
-    private function getPayload($path)
+    private function getPayload(string $path)
     {
         if (strpos($path, self::BASE_PATH) === false) {
             return;

@@ -83,9 +83,7 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals('Dpr,Viewport-Width,Width', $response->getHeaderLine('Accept-CH'));
 
         $info = getimagesizefromstring((string) $response->getBody());
-
         $this->assertEquals(50, $info[0]);
-        $this->assertEquals(IMAGETYPE_JPEG, $info[2]);
     }
 
     public function testNoAcceptHeader()

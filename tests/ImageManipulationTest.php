@@ -80,7 +80,6 @@ class ImageManipulationTest extends TestCase
         );
 
         $this->assertEquals('jpg', pathinfo($uri, PATHINFO_EXTENSION));
-        $this->assertEquals('image/jpeg', $response->getHeaderLine('Content-Type'));
         $this->assertEquals('Dpr,Viewport-Width,Width', $response->getHeaderLine('Accept-CH'));
 
         $info = getimagesizefromstring((string) $response->getBody());

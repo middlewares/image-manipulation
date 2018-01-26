@@ -71,7 +71,7 @@ class ImageManipulation implements MiddlewareInterface
      */
     public function __construct(string $signatureKey)
     {
-        $this->signatureKey = self::$currentSignatureKey = $signatureKey;
+        $this->signatureKey = $signatureKey;
     }
 
     /**
@@ -89,32 +89,36 @@ class ImageManipulation implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $previousSignatureKey = self::$currentSignatureKey;
+        self::$currentSignatureKey = $this->signatureKey;
+
         if (strpos($request->getHeaderLine('Accept'), 'image/') === false) {
-            return $handler->handle($request);
+            $response = $handler->handle($request);
+        } else {
+            $uri = $request->getUri();
+            $payload = self::getPayload($uri->getPath());
+
+            if (!$payload) {
+                $response = $handler->handle($request);
+            } else {
+                list($path, $transform) = $payload;
+
+                $request = $request->withUri($uri->withPath($path));
+                $response = $handler->handle($request);
+
+                if (!empty($this->clientHints)) {
+                    $response = $response->withHeader('Accept-CH', implode(',', $this->clientHints));
+                }
+
+                $size = $response->getBody()->getSize();
+
+                if ($response->getStatusCode() === 200 && ($size === null || $size > 1)) {
+                    $response = $this->transform($response, $transform, $this->getClientHints($request));
+                }
+            }
         }
 
-        $uri = $request->getUri();
-        $payload = self::getPayload($uri->getPath());
-
-        if (!$payload) {
-            return $handler->handle($request);
-        }
-
-        list($path, $transform) = $payload;
-
-        $request = $request->withUri($uri->withPath($path));
-        $response = $handler->handle($request);
-
-        if (!empty($this->clientHints)) {
-            $response = $response->withHeader('Accept-CH', implode(',', $this->clientHints));
-        }
-
-        $size = $response->getBody()->getSize();
-
-        if ($response->getStatusCode() === 200 && ($size === null || $size > 1)) {
-            return $this->transform($response, $transform, $this->getClientHints($request));
-        }
-
+        self::$currentSignatureKey = $previousSignatureKey;
         return $response;
     }
 

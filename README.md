@@ -59,14 +59,19 @@ $dispatcher = new Dispatcher([
     new Writer($cachePath),
 
     //transform the image
-	new Middlewares\ImageManipulation($key),
+    new Middlewares\ImageManipulation($key),
 
-    //read and return a response with original image
-    new Reader($imagePath)
+    //read and return a response with original image if exists
+    (new Reader($imagePath))->continueOnError(),
+
+    //In your views
+    function () {
+        //Create a manipulated image uri
+        $uri = Middlewares\ImageManipulation::getUri('image.jpg', 'resizeCrop,500,500,CROP_ENTROPY');
+
+        echo "<img src='{$uri}' alt='Manipulated image' width=500 height=500>";
+    }
 ]);
-
-//Create a manipulated image uri
-$uri = Middlewares\ImageManipulation::getUri('image.jpg', 'resizeCrop,500,500,CROP_ENTROPY');
 
 $response = $dispatcher->dispatch(new ServerRequest($uri));
 ```

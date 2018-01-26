@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## [1.0.0] - 2018-01-26
 
 ### Added
 
@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Updated license year
+- Removed the temporary static variable `ImageManipulation::$currentSignatureKey` after the middleware execution
 
 ## [0.5.0] - 2017-11-13
 
@@ -88,7 +89,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First version
 
-[UNRELEASED]: https://github.com/middlewares/image-manipulation/compare/v0.5.0...HEAD
+[1.0.0]: https://github.com/middlewares/image-manipulation/compare/v0.5.0...v1.0.0
 [0.5.0]: https://github.com/middlewares/image-manipulation/compare/v0.4.4...v0.5.0
 [0.4.4]: https://github.com/middlewares/image-manipulation/compare/v0.3.4...v0.4.4
 [0.3.4]: https://github.com/middlewares/image-manipulation/compare/v0.3.3...v0.3.4

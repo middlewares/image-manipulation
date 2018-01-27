@@ -53,16 +53,16 @@ $imagePath = '/path/to/images';
 
 $dispatcher = new Dispatcher([
     //read and returns the manipulated image if it's currently cached
-    (new Reader($cachePath))->continueOnError(),
+    Reader::createFromDirectory($cachePath)->continueOnError(),
 
     //saves the manipulated images returned by the next middleware
-    new Writer($cachePath),
+    Writer::createFromDirectory($cachePath),
 
     //transform the image
     new Middlewares\ImageManipulation($key),
 
     //read and return a response with original image if exists
-    (new Reader($imagePath))->continueOnError(),
+    Reader::createFromDirectory($imagePath)->continueOnError(),
 
     //In your views
     function () {

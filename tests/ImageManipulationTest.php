@@ -34,7 +34,7 @@ class ImageManipulationTest extends TestCase
     {
         $key = uniqid();
         $uri = ImageManipulation::getUri($path, 'resizeCrop,50,50|format,png', $key);
-        $request = Factory::createServerRequest([], 'GET', $basePath.$uri)
+        $request = Factory::createServerRequest('GET', $basePath.$uri)
             ->withHeader('Accept', 'image/*');
 
         $response = Dispatcher::run([
@@ -74,7 +74,7 @@ class ImageManipulationTest extends TestCase
                     echo file_get_contents(__DIR__.'/assets/vaca_rubia_galega_oroso.jpg');
                 },
             ],
-            Factory::createServerRequest([], 'GET', $uri)
+            Factory::createServerRequest('GET', $uri)
                 ->withHeader('Accept', 'image/*')
                 ->withHeader('Width', '50')
         );
@@ -98,7 +98,7 @@ class ImageManipulationTest extends TestCase
                     echo 'Foo';
                 },
             ],
-            Factory::createServerRequest([], 'GET', $uri)
+            Factory::createServerRequest('GET', $uri)
         );
 
         $this->assertFalse($response->hasHeader('Content-Type'));
@@ -117,7 +117,7 @@ class ImageManipulationTest extends TestCase
                     return Factory::createResponse(404);
                 },
             ],
-            Factory::createServerRequest([], 'GET', $uri)
+            Factory::createServerRequest('GET', $uri)
                 ->withHeader('Accept', 'image/*')
         );
 
@@ -135,7 +135,7 @@ class ImageManipulationTest extends TestCase
                     echo file_get_contents(__DIR__.'/assets/vaca_rubia_galega_oroso.jpg');
                 },
             ],
-            Factory::createServerRequest([], 'GET', '/_/invalid-url.jpg')
+            Factory::createServerRequest('GET', '/_/invalid-url.jpg')
                 ->withHeader('Accept', 'image/*')
         );
 
@@ -155,7 +155,7 @@ class ImageManipulationTest extends TestCase
                     echo file_get_contents(__DIR__.'/assets/vaca_rubia_galega_oroso.jpg');
                 },
             ],
-            Factory::createServerRequest([], 'GET', '/invalid-url.jpg')
+            Factory::createServerRequest('GET', '/invalid-url.jpg')
                 ->withHeader('Accept', 'image/*')
         );
 
@@ -176,7 +176,7 @@ class ImageManipulationTest extends TestCase
                     echo file_get_contents(__DIR__.'/assets/vaca_rubia_galega_oroso.jpg');
                 },
             ],
-            Factory::createServerRequest([], 'GET', $uri)
+            Factory::createServerRequest('GET', $uri)
                 ->withHeader('Accept', 'image/*')
         );
 

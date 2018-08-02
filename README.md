@@ -22,7 +22,7 @@ It's possible to combine this library with [middlewares/filesystem](https://gith
 ## Requirements
 
 * PHP >= 7.0
-* A [PSR-7](https://packagist.org/providers/psr/http-message-implementation) http message implementation ([Diactoros](https://github.com/zendframework/zend-diactoros), [Guzzle](https://github.com/guzzle/psr7), [Slim](https://github.com/slimphp/Slim), etc...)
+* A [PSR-7 http library](https://github.com/middlewares/awesome-psr15-middlewares#psr-7-implementations)
 * A [PSR-15 middleware dispatcher](https://github.com/middlewares/awesome-psr15-middlewares#dispatcher)
 
 ## Installation
@@ -85,6 +85,10 @@ The key used to sign the uri. This prevent attacks and alterations to the path.
 #### `clientHints(array $clientHings)`
 
 Allow to use client hints. Is disabled by default. If this method is called with the default arguments, the allowed hints are `['Dpr', 'Viewport-Width', 'Width']`. Note that client hints [are supported only by Chrome and Opera browsers](http://caniuse.com/#feat=client-hints-dpr-width-viewport)
+
+#### `streamFactory(Psr\Http\Message\StreamFactoryInterface $streamFactory)`
+
+A PSR-17 factory to create the response body.
 
 ## Helpers
 

@@ -19,7 +19,7 @@
         "php": "^7.0",
         "imagecow/imagecow": "^2.1",
         "lcobucci/jwt": "^3.2",
-        "middlewares/utils": "^2.0",
+        "middlewares/utils": "^2.1",
         "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {

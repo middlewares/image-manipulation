@@ -24,7 +24,7 @@ class ImageManipulation implements MiddlewareInterface
     const BASE_PATH = '/_/';
 
     /**
-     * @var string
+     * @var string|null
      */
     private static $currentSignatureKey;
 
@@ -174,16 +174,20 @@ class ImageManipulation implements MiddlewareInterface
     private function getPayload(string $path)
     {
         if (strpos($path, self::BASE_PATH) === false) {
-            return;
+            return null;
         }
 
         try {
             list($basePath, $token) = explode(self::BASE_PATH, $path, 2);
 
-            $token = (new Parser())->parse(str_replace('/', '', substr($token, 0, strrpos($token, '.'))));
+            if ($extensionPos = strrpos($token, '.')) {
+                $token = substr($token, 0, $extensionPos);
+            }
+
+            $token = (new Parser())->parse(str_replace('/', '', $token));
 
             if (!$token->verify(new Sha256(), $this->signatureKey)) {
-                return;
+                return null;
             }
 
             $payload = $token->getClaim(self::DATA_CLAIM);
@@ -194,7 +198,7 @@ class ImageManipulation implements MiddlewareInterface
 
             return $payload;
         } catch (Exception $exception) {
-            return;
+            return null;
         }
     }
 }

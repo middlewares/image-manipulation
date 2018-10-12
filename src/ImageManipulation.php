@@ -9,6 +9,8 @@ use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Middlewares\Utils\Traits\HasStreamFactory;
+use Middlewares\Utils\Factory;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -72,9 +74,10 @@ class ImageManipulation implements MiddlewareInterface
     /**
      * Set the signature key used to encode/decode the data.
      */
-    public function __construct(string $signatureKey)
+    public function __construct(string $signatureKey, StreamFactoryInterface $streamFactory = null)
     {
         $this->signatureKey = $signatureKey;
+        $this->streamFactory = $streamFactory ?: Factory::getStreamFactory();
     }
 
     /**

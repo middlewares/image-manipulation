@@ -78,9 +78,10 @@ $response = $dispatcher->dispatch(new ServerRequest($uri));
 
 ## Options
 
-#### `__construct(string $signatureKey)`
+#### `__construct(string $signatureKey, Psr\Http\Message\StreamFactoryInterface = null)`
 
-The key used to sign the uri. This prevent attacks and alterations to the path. 
+The first argument is key used to sign the uri. This prevent attacks and alterations to the path. 
+The second argument is the PSR-17 factory to create the response body.
 
 #### `clientHints(array $clientHings)`
 

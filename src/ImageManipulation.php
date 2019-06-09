@@ -52,12 +52,12 @@ class ImageManipulation implements MiddlewareInterface
                 ' You must instantiate the middleware or assign the key as third argument');
         }
 
-        $pos = strrpos($transform, 'format,');
+        preg_match('/format,(\w+)/', $transform, $matches);
 
-        if ($pos === false) {
+        if (empty($matches[1])) {
             $extension = pathinfo($path, PATHINFO_EXTENSION);
         } else {
-            $extension = substr($transform, $pos + 7, 3);
+            $extension = $matches[1];
         }
 
         $token = (new Builder())

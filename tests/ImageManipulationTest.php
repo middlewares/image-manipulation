@@ -185,4 +185,13 @@ class ImageManipulationTest extends TestCase
 
         $this->assertEquals($original, $info);
     }
+
+    public function testWebp()
+    {
+        $uri = ImageManipulation::getUri('/foto.jpg', 'resize,200|format,webp', 'foo');
+        $this->assertEquals(
+            '/_/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpbSI6WyJcL2ZvdG8uanBnIiwicmVzaXplLDIwMHxmb3JtYXQsd2VicCJdfQ.9yGglGL-yRxicXrdmblH3VYkAPWZ_PytGJVyYzFsKi0.webp',
+            $uri
+        );
+    }
 }

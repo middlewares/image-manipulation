@@ -87,6 +87,10 @@ The second argument is the PSR-17 factory to create the response body.
 
 Allow to use client hints. Is disabled by default. If this method is called with the default arguments, the allowed hints are `['Dpr', 'Viewport-Width', 'Width']`. Note that client hints [are supported only by Chrome and Opera browsers](http://caniuse.com/#feat=client-hints-dpr-width-viewport)
 
+#### `library(string $library)`
+
+The library to use. It can be `Gd` or `Imagick`. It's autodetected if it's not specified.
+
 #### `streamFactory(Psr\Http\Message\StreamFactoryInterface $streamFactory)`
 
 A PSR-17 factory to create the response body.

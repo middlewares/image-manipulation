@@ -31,6 +31,11 @@ class ImageManipulation implements MiddlewareInterface
     private static $currentSignatureKey;
 
     /**
+     * @var string|null
+     */
+    private $library;
+
+    /**
      * @var string
      */
     private $signatureKey;
@@ -91,6 +96,16 @@ class ImageManipulation implements MiddlewareInterface
     }
 
     /**
+     * Force the use of a library (Imagick | Gd)
+     */
+    public function library(string $library): self
+    {
+        $this->library = $library;
+
+        return $this;
+    }
+
+    /**
      * Process a request and return a response.
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -133,7 +148,7 @@ class ImageManipulation implements MiddlewareInterface
      */
     private function transform(ResponseInterface $response, string $transform, array $hints = null): ResponseInterface
     {
-        $image = Image::fromString((string) $response->getBody());
+        $image = Image::fromString((string) $response->getBody(), $this->library);
 
         if ($hints) {
             $image->setClientHints($hints);

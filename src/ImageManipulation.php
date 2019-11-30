@@ -168,30 +168,28 @@ class ImageManipulation implements MiddlewareInterface
 
     /**
      * Returns the client hints sent.
-     *
-     * @return array|null
      */
-    private function getClientHints(ServerRequestInterface $request)
+    private function getClientHints(ServerRequestInterface $request): ?array
     {
-        if (!empty($this->clientHints)) {
-            $hints = [];
-
-            foreach ($this->clientHints as $name) {
-                if ($request->hasHeader($name)) {
-                    $hints[$name] = $request->getHeaderLine($name);
-                }
-            }
-
-            return $hints;
+        if (empty($this->clientHints)) {
+            return null;
         }
+
+        $hints = [];
+
+        foreach ($this->clientHints as $name) {
+            if ($request->hasHeader($name)) {
+                $hints[$name] = $request->getHeaderLine($name);
+            }
+        }
+
+        return $hints;
     }
 
     /**
      * Parse and return the payload.
-     *
-     * @return array|null
      */
-    private function getPayload(string $path)
+    private function getPayload(string $path): ?array
     {
         if (strpos($path, self::BASE_PATH) === false) {
             return null;

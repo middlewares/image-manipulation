@@ -8,6 +8,7 @@ use Imagecow\Image;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Signer\Key;
 use Middlewares\Utils\Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -68,9 +69,8 @@ class ImageManipulation implements MiddlewareInterface
         }
 
         $token = (new Builder())
-            ->set(self::DATA_CLAIM, [$path, $transform])
-            ->sign(new Sha256(), $signatureKey)
-            ->getToken();
+            ->withClaim(self::DATA_CLAIM, [$path, $transform])
+            ->getToken(new Sha256(), new Key($signatureKey));
 
         $token = chunk_split((string) $token, self::MAX_FILENAME_LENGTH, '/');
         $token = str_replace('/.', './', $token);

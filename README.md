@@ -104,9 +104,9 @@ The library to use. It can be `Gd` or `Imagick`. It's autodetected if it's not s
 
 ## Helpers
 
-### getUri(string $image, string $transform, string $signatureKey = null)`
+### getUri
 
-To ease the uri creation this static method is provided, accepting three methods:
+To ease the uri creation this static method is provided, accepting three arguments:
 
 * `$image`: The image path. This value is used to replace the uri's path of the request to the next middlewares.
 * `$transform`: The transformation details. You can use any [method of imagecow api](https://github.com/oscarotero/imagecow#execute-multiple-functions) as a string, for example:

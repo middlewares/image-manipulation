@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - 2019-11-30
+### Removed
+- Support for PHP 7.0 and 7.1
+- The `streamFactory()` option. Use the second argument of the constructor.
+
 ## [1.3.0] - 2019-08-11
 ### Added
 - New option `library` to force to use a library (Gd or Imagick).

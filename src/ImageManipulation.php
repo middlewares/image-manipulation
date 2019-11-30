@@ -8,19 +8,16 @@ use Imagecow\Image;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
-use Middlewares\Utils\Traits\HasStreamFactory;
 use Middlewares\Utils\Factory;
-use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
 
 class ImageManipulation implements MiddlewareInterface
 {
-    use HasStreamFactory;
-
     const MAX_FILENAME_LENGTH = 200;
     const DATA_CLAIM = 'im';
     const BASE_PATH = '/_/';
@@ -44,6 +41,11 @@ class ImageManipulation implements MiddlewareInterface
      * @var array|false Enable client hints
      */
     private $clientHints = false;
+
+    /**
+     * @var StreamFactoryInterface
+     */
+    private $streamFactory;
 
     /**
      * Build a new uri with the payload.
@@ -157,7 +159,7 @@ class ImageManipulation implements MiddlewareInterface
 
         $image->transform($transform);
 
-        $body = $this->createStream($image->getString());
+        $body = $this->streamFactory->createStream($image->getString());
 
         return $response
             ->withBody($body)

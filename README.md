@@ -5,7 +5,6 @@
 [![Build Status][ico-travis]][link-travis]
 [![Quality Score][ico-scrutinizer]][link-scrutinizer]
 [![Total Downloads][ico-downloads]][link-downloads]
-[![SensioLabs Insight][ico-sensiolabs]][link-sensiolabs]
 
 Middleware to transform images on demand, allowing resize, crop, rotate and transform to other formats. Uses [imagecow](https://github.com/oscarotero/imagecow) library that can detect and use `Gd` and `Imagick`, and also has support for [client hints](https://www.smashingmagazine.com/2016/01/leaner-responsive-images-client-hints/) and different [automatic cropping methods](https://github.com/oscarotero/imagecow#automatic-cropping).
 
@@ -21,7 +20,7 @@ It's possible to combine this library with [middlewares/filesystem](https://gith
 
 ## Requirements
 
-* PHP >= 7.0
+* PHP >= 7.2
 * A [PSR-7 http library](https://github.com/middlewares/awesome-psr15-middlewares#psr-7-implementations)
 * A [PSR-15 middleware dispatcher](https://github.com/middlewares/awesome-psr15-middlewares#dispatcher)
 
@@ -76,28 +75,36 @@ $dispatcher = new Dispatcher([
 $response = $dispatcher->dispatch(new ServerRequest($uri));
 ```
 
-## Options
+## Usage
 
-#### `__construct(string $signatureKey, Psr\Http\Message\StreamFactoryInterface = null)`
+You need a key to sign the uri. This prevent attacks and alterations to the path. 
 
-The first argument is key used to sign the uri. This prevent attacks and alterations to the path. 
-The second argument is the PSR-17 factory to create the response body.
+```php
+$key = 'super-secret-key';
 
-#### `clientHints(array $clientHings)`
+$imageManipulation = new Middlewares\ImageManipulation($key);
+```
 
-Allow to use client hints. Is disabled by default. If this method is called with the default arguments, the allowed hints are `['Dpr', 'Viewport-Width', 'Width']`. Note that client hints [are supported only by Chrome and Opera browsers](http://caniuse.com/#feat=client-hints-dpr-width-viewport)
+Optionally, you can provide a `Psr\Http\Message\StreamFactoryInterface` as the second argument to create the new response stream with the image. If it's not defined, [Middleware\Utils\Factory](https://github.com/middlewares/utils#factory) will be used to detect it automatically.
 
-#### `library(string $library)`
+```php
+$key = 'super-secret-key';
+$streamFactory = new MyOwnStreamFactory();
+
+$imageManipulation = new Middlewares\ImageManipulation($key, $streamFactory);
+```
+
+### clientHints
+
+This option allows to use client hints, that is disabled by default. If this method is called with the default arguments, the allowed hints are `['Dpr', 'Viewport-Width', 'Width']`. Note that client hints [are supported only by Chrome and Opera browsers](http://caniuse.com/#feat=client-hints-dpr-width-viewport)
+
+### library
 
 The library to use. It can be `Gd` or `Imagick`. It's autodetected if it's not specified.
 
-#### `streamFactory(Psr\Http\Message\StreamFactoryInterface $streamFactory)`
-
-A PSR-17 factory to create the response body.
-
 ## Helpers
 
-#### `ImageManipulation::getUri(string $image, string $transform, string $signatureKey = null)`
+### getUri(string $image, string $transform, string $signatureKey = null)`
 
 To ease the uri creation this static method is provided, accepting three methods:
 
@@ -108,6 +115,17 @@ To ease the uri creation this static method is provided, accepting three methods
   * `crop,100,100,CROP_ENTROPY`: Crop the image to 100x100px using the entropy method to find the most interesting point of the image
   * `resize,300|rotate,90|format,jpg`: Resize the image to 300px width, rotate 90º and convert to jpg
 * `$signatureKey`: Optional signature key to sign the uri path. If it's not provided, use the same key passed to the middleware.
+
+```php
+use Middlewares\ImageManipulation;
+
+$image = '/img/avatar.jpg';
+$transform = 'resizeCrop,200,200';
+
+$uri = ImageManipulation::getUri($image, $transform);
+
+echo '<img src="'.$uri.'" alt="My image">';
+```
 
 ---
 
@@ -120,10 +138,8 @@ The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
 [ico-travis]: https://img.shields.io/travis/middlewares/image-manipulation/master.svg?style=flat-square
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/g/middlewares/image-manipulation.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/middlewares/image-manipulation.svg?style=flat-square
-[ico-sensiolabs]: https://img.shields.io/sensiolabs/i/ee425553-881b-46ee-b3f7-a56409809a11.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/middlewares/image-manipulation
 [link-travis]: https://travis-ci.org/middlewares/image-manipulation
 [link-scrutinizer]: https://scrutinizer-ci.com/g/middlewares/image-manipulation
 [link-downloads]: https://packagist.org/packages/middlewares/image-manipulation
-[link-sensiolabs]: https://insight.sensiolabs.com/projects/ee425553-881b-46ee-b3f7-a56409809a11

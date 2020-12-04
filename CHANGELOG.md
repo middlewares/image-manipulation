@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.1] - 2020-12-03
+### Added
+- Support for PHP 8
+
 ## [2.0.0] - 2019-11-30
 ### Removed
 - Support for PHP 7.0 and 7.1
@@ -87,6 +91,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 0.1.0 - 2016-10-07
 First version
 
+[2.0.1]: https://github.com/middlewares/image-manipulation/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/middlewares/image-manipulation/compare/v1.3.0...v2.0.0
 [1.3.0]: https://github.com/middlewares/image-manipulation/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/middlewares/image-manipulation/compare/v1.1.0...v1.2.0

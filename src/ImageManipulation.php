@@ -9,6 +9,7 @@ use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key;
+use Lcobucci\JWT\Signer\Key\InMemory;
 use Middlewares\Utils\Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -204,7 +205,7 @@ class ImageManipulation implements MiddlewareInterface
 
             $token = (new Parser())->parse(str_replace('/', '', $token));
 
-            if (!$token->verify(new Sha256(), $this->signatureKey)) {
+            if (!$token->verify(new Sha256(), InMemory::plainText($this->signatureKey))) {
                 return null;
             }
 

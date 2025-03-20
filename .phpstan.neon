@@ -1,0 +1,16 @@
+parameters:
+    reportUnmatchedIgnoredErrors: false
+    level: max
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        -
+            message: '#.*getPayload\(\) should return.*#'
+            reportUnmatched: false
+        -
+            identifier: 'method.nonObject'
+            reportUnmatched: false
+        -
+            identifier: 'argument.type'
+            reportUnmatched: false

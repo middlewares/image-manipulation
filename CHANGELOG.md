@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [3.0.0] - 2020-12-03
+## [3.0.0] - 2025-03-21
 ### Changed
 - Updated `lcobucci/jwt` to version 4 for PHP 7.4 and 8.0, and to version 5 for >=8.1. PHP 7.2 and 7.3 are deprecated.
 - A code behaviour wise breaking change is introduced by `lcobucci/jwt` package. Now if you pass the optional signature key, it will have to be a 256 bits key, otherwise, `lcobucci/jwt` will throw `Lcobucci\JWT\Signer\InvalidKeyProvided` exception:

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [3.0.0] - 2025-03-21
 ### Changed
+- The minimum PHP version now is 7.4.
 - Updated `lcobucci/jwt` to version 4 for PHP 7.4 and 8.0, and to version 5 for >=8.1. PHP 7.2 and 7.3 are deprecated.
 - A code behaviour wise breaking change is introduced by `lcobucci/jwt` package. Now if you pass the optional signature key, it will have to be a 256 bits key, otherwise, `lcobucci/jwt` will throw `Lcobucci\JWT\Signer\InvalidKeyProvided` exception:
 
@@ -18,7 +19,7 @@ You can use `sodium_crypto_aead_aes256gcm_keygen()` to generate the key or use a
 
 ~~## [2.0.1] - 2020-12-03
 ### Added
-- Support for PHP 8~~
+- Support for PHP 8
 
 ## [2.0.0] - 2019-11-30
 ### Removed
@@ -102,7 +103,7 @@ You can use `sodium_crypto_aead_aes256gcm_keygen()` to generate the key or use a
 ## 0.1.0 - 2016-10-07
 First version
 
-[3.0.0]: https://github.com/middlewares/image-manipulation/compare/v2.0.1...v3.0.0]
+[3.0.0]: https://github.com/middlewares/image-manipulation/compare/v2.0.1...v3.0.0
 [2.0.1]: https://github.com/middlewares/image-manipulation/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/middlewares/image-manipulation/compare/v1.3.0...v2.0.0
 [1.3.0]: https://github.com/middlewares/image-manipulation/compare/v1.2.0...v1.3.0

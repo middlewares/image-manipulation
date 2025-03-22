@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [3.0.0] - 2025-03-21
 ### Changed
-- The minimum PHP version now is 7.4.
-- Updated `lcobucci/jwt` to version 4 for PHP 7.4 and 8.0, and to version 5 for >=8.1. PHP 7.2 and 7.3 are deprecated.
+- The minimum PHP version now is 7.4. PHP 7.2 and 7.3 are deprecated.
+- Updated `lcobucci/jwt` to version 4 for PHP 7.4 and 8.0, and to version 5 for >=8.1.
 - A code behaviour wise breaking change is introduced by `lcobucci/jwt` package. Now if you pass the optional signature key, it will have to be a 256 bits key, otherwise, `lcobucci/jwt` will throw `Lcobucci\JWT\Signer\InvalidKeyProvided` exception:
 
 ```php
@@ -17,7 +17,7 @@ ImageManipulation::getUri('/foto.jpg', 'resize,200', $signatureKey);
 
 You can use `sodium_crypto_aead_aes256gcm_keygen()` to generate the key or use a random 256bits string generator.
 
-~~## [2.0.1] - 2020-12-03
+## [2.0.1] - 2020-12-03
 ### Added
 - Support for PHP 8
 

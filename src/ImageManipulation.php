@@ -5,11 +5,11 @@ namespace Middlewares;
 
 use Exception;
 use Imagecow\Image;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Middlewares\Utils\Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,9 +20,9 @@ use RuntimeException;
 
 class ImageManipulation implements MiddlewareInterface
 {
-    const MAX_FILENAME_LENGTH = 200;
-    const DATA_CLAIM = 'im';
-    const BASE_PATH = '/_/';
+    public const MAX_FILENAME_LENGTH = 200;
+    public const DATA_CLAIM = 'im';
+    public const BASE_PATH = '/_/';
 
     /**
      * @var string|null
@@ -40,7 +40,7 @@ class ImageManipulation implements MiddlewareInterface
     private $signatureKey;
 
     /**
-     * @var array|false Enable client hints
+     * @var string[]|false Enable client hints
      */
     private $clientHints = false;
 
@@ -51,8 +51,10 @@ class ImageManipulation implements MiddlewareInterface
 
     /**
      * Build a new uri with the payload.
+     *
+     * @param non-empty-string|null $signatureKey
      */
-    public static function getUri(string $path, string $transform, string $signatureKey = null): string
+    public static function getUri(string $path, string $transform, ?string $signatureKey = null): string
     {
         $signatureKey = $signatureKey ?: self::$currentSignatureKey;
 
@@ -69,20 +71,24 @@ class ImageManipulation implements MiddlewareInterface
             $extension = $matches[1];
         }
 
-        $token = (new Builder())
+        $config = Configuration::forSymmetricSigner(
+            new Sha256(),
+            InMemory::plainText($signatureKey)
+        );
+
+        $token = $config->builder()
             ->withClaim(self::DATA_CLAIM, [$path, $transform])
-            ->getToken(new Sha256(), new Key($signatureKey));
+            /* @throws \Lcobucci\JWT\Signer\InvalidKeyProvided quick reminder */
+            ->getToken($config->signer(), $config->signingKey())
+            ->toString();
 
-        $token = chunk_split((string) $token, self::MAX_FILENAME_LENGTH, '/');
-        $token = str_replace('/.', './', $token);
-
-        return self::BASE_PATH.substr($token, 0, -1).'.'.$extension;
+        return self::BASE_PATH.substr($token.'/', 0, -1).'.'.$extension;
     }
 
     /**
      * Set the signature key used to encode/decode the data.
      */
-    public function __construct(string $signatureKey, StreamFactoryInterface $streamFactory = null)
+    public function __construct(string $signatureKey, ?StreamFactoryInterface $streamFactory = null)
     {
         $this->signatureKey = $signatureKey;
         $this->streamFactory = $streamFactory ?: Factory::getStreamFactory();
@@ -90,6 +96,8 @@ class ImageManipulation implements MiddlewareInterface
 
     /**
      * Enable the client hints.
+     *
+     * @param string[] $clientHints
      */
     public function clientHints(array $clientHints = ['Dpr', 'Viewport-Width', 'Width']): self
     {
@@ -143,13 +151,16 @@ class ImageManipulation implements MiddlewareInterface
         }
 
         self::$currentSignatureKey = $previousSignatureKey;
+
         return $response;
     }
 
     /**
      * Transform the image.
+     *
+     * @param array<string,string>|null $hints
      */
-    private function transform(ResponseInterface $response, string $transform, array $hints = null): ResponseInterface
+    private function transform(ResponseInterface $response, string $transform, ?array $hints = null): ResponseInterface
     {
         $image = Image::fromString((string) $response->getBody(), $this->library);
 
@@ -169,6 +180,8 @@ class ImageManipulation implements MiddlewareInterface
 
     /**
      * Returns the client hints sent.
+     *
+     * @return array<string,string>|null
      */
     private function getClientHints(ServerRequestInterface $request): ?array
     {
@@ -189,6 +202,8 @@ class ImageManipulation implements MiddlewareInterface
 
     /**
      * Parse and return the payload.
+     *
+     * @return array{0: string, 1:string}
      */
     private function getPayload(string $path): ?array
     {
@@ -203,15 +218,25 @@ class ImageManipulation implements MiddlewareInterface
                 $token = substr($token, 0, $extensionPos);
             }
 
-            $token = (new Parser())->parse(str_replace('/', '', $token));
+            $config = Configuration::forSymmetricSigner(
+                new Sha256(),
+                InMemory::plainText($this->signatureKey)
+            );
 
-            if (!$token->verify(new Sha256(), InMemory::plainText($this->signatureKey))) {
+            $token = $config->parser()->parse(str_replace('/', '', $token));
+            if (!$config->validator()->validate(
+                $token,
+                ...[new SignedWith($config->signer(), $config->signingKey())]
+            )) {
                 return null;
             }
 
-            $payload = $token->getClaim(self::DATA_CLAIM);
+            /** @phpstan-ignore-next-line */
+            $payload = $token->claims()->get(self::DATA_CLAIM);
 
+            /* @phpstan-ignore-next-line */
             if ($payload) {
+                /* @phpstan-ignore-next-line */
                 $payload[0] = str_replace('//', '/', '/'.$basePath.'/'.$payload[0]);
             }
 

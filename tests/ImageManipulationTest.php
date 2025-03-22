@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Middlewares\Tests;
 
+use Lcobucci\JWT\Signer\InvalidKeyProvided;
 use Middlewares\ImageManipulation;
 use Middlewares\Utils\Dispatcher;
 use Middlewares\Utils\Factory;
@@ -11,13 +12,16 @@ use RuntimeException;
 
 class ImageManipulationTest extends TestCase
 {
-    public function testNoSignatureException()
+    public function testNoSignatureException(): void
     {
         $this->expectException(RuntimeException::class);
 
         $uri = ImageManipulation::getUri('/foto.jpg', 'resize,200');
     }
 
+    /**
+     * @return array<string[]>
+     */
     public function basePathProvider(): array
     {
         return [
@@ -30,9 +34,9 @@ class ImageManipulationTest extends TestCase
     /**
      * @dataProvider basePathProvider
      */
-    public function testImageManipulation(string $basePath, string $path)
+    public function testImageManipulation(string $basePath, string $path): void
     {
-        $key = uniqid();
+        $key = sodium_crypto_aead_aes256gcm_keygen();
         $uri = ImageManipulation::getUri($path, 'resizeCrop,50,50|format,png', $key);
         $request = Factory::createServerRequest('GET', $basePath.$uri)
             ->withHeader('Accept', 'image/*');
@@ -44,6 +48,7 @@ class ImageManipulationTest extends TestCase
                 $content = file_get_contents(__DIR__.'/assets/vaca_rubia_galega_oroso.jpg');
 
                 $response = Factory::createResponse();
+                /* @phpstan-ignore-next-line */
                 $response->getBody()->write($content);
 
                 return $response;
@@ -55,14 +60,17 @@ class ImageManipulationTest extends TestCase
 
         $info = getimagesizefromstring((string) $response->getBody());
 
+        /* @phpstan-ignore-next-line */
         $this->assertEquals(50, $info[0]);
+        /* @phpstan-ignore-next-line */
         $this->assertEquals(50, $info[1]);
+        /* @phpstan-ignore-next-line */
         $this->assertEquals(IMAGETYPE_PNG, $info[2]);
     }
 
-    public function testClientHint()
+    public function testClientHint(): void
     {
-        $key = uniqid();
+        $key = sodium_crypto_aead_aes256gcm_keygen();
         $uri = ImageManipulation::getUri('/foto.jpg', 'resize,200', $key);
 
         $response = Dispatcher::run(
@@ -83,12 +91,13 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals('Dpr,Viewport-Width,Width', $response->getHeaderLine('Accept-CH'));
 
         $info = getimagesizefromstring((string) $response->getBody());
+        /* @phpstan-ignore-next-line */
         $this->assertEquals(50, $info[0]);
     }
 
-    public function testNoAcceptHeader()
+    public function testNoAcceptHeader(): void
     {
-        $key = uniqid();
+        $key = sodium_crypto_aead_aes256gcm_keygen();
         $uri = ImageManipulation::getUri('/foto.jpg', 'resize,200', $key);
 
         $response = Dispatcher::run(
@@ -105,9 +114,9 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals('Foo', (string) $response->getBody());
     }
 
-    public function testNotFound()
+    public function testNotFound(): void
     {
-        $key = uniqid();
+        $key = sodium_crypto_aead_aes256gcm_keygen();
         $uri = ImageManipulation::getUri('/foto.jpg', 'resize,200', $key);
 
         $response = Dispatcher::run(
@@ -125,7 +134,7 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals(404, $response->getStatusCode());
     }
 
-    public function testInvalidUri()
+    public function testInvalidUri(): void
     {
         $response = Dispatcher::run(
             [
@@ -145,7 +154,7 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals($original, $info);
     }
 
-    public function testNoBasePath()
+    public function testNoBasePath(): void
     {
         $response = Dispatcher::run(
             [
@@ -165,9 +174,11 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals($original, $info);
     }
 
-    public function testInvalidToken()
+    public function testInvalidToken(): void
     {
+        static::expectException(InvalidKeyProvided::class);
         $uri = ImageManipulation::getUri('/foto.jpg', 'resize,200', 'foo');
+
         $response = Dispatcher::run(
             [
                 new ImageManipulation('bar'),
@@ -186,12 +197,14 @@ class ImageManipulationTest extends TestCase
         $this->assertEquals($original, $info);
     }
 
-    public function testWebp()
+    public function testWebp(): void
     {
-        $uri = ImageManipulation::getUri('/foto.jpg', 'resize,200|format,webp', 'foo');
+        $uri = ImageManipulation::getUri('/foto.jpg', 'resize,200|format,webp', '3508e2c96f7c4cd0'
+                                                   .'31a119514a50ff684729bc109889b3b6c4eff157f8cfda27');
+
         $this->assertEquals(
-            '/_/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpbSI6WyJcL2ZvdG8uanBnIiwicmVzaXplLDIwMHxmb3JtYXQsd2VicCJdfQ.'
-            .'9yGglGL-yRxicXrdmblH3VYkAPWZ_PytGJVyYzFsKi0.webp',
+            '/_/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpbSI6WyIvZm90by5qcGciLCJyZXNpemUs'
+            .'MjAwfGZvcm1hdCx3ZWJwIl19.R-ahvCSRU1SGzrTxI2sFdHDjA8kreRSSlA_a1jHD0e4.webp',
             $uri
         );
     }
